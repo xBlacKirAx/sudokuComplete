@@ -54,10 +54,14 @@ public class TestMainFrame extends JFrame implements MouseListener{
                     cells[i][j][k]=new SudokuCell();
                     grid.add(cells[i][j][k]);
                     
-                    cells[i][j][k].setText(""+m.getMap()[i][j][k]);
-                    cells[i][j][k].setEnabled(false);
-                    cells[i][j][k].setForeground(Color.gray);
-                    
+                    if(Math.random()*10>m.difficulty){
+                        cells[i][j][k].setText(""+m.getMap()[i][j][k]);
+                        cells[i][j][k].setEnabled(false);
+                        cells[i][j][k].setForeground(Color.gray);
+                    }else{
+                        cells[i][j][k].addMouseListener(this);
+                        cells[i][j][k].setBackground(Color.orange);
+                    }
                     grid.add(cells[i][j][k]);
                 }
             }
@@ -86,26 +90,33 @@ public class TestMainFrame extends JFrame implements MouseListener{
     
     @Override
     public void mouseClicked(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if(e.getButton()==MouseEvent.BUTTON1){
+            if(selectNum!=null){
+            selectNum.dispose();
+        }
+            selectNum=new SelectNumFrame();
+            selectNum.setLocation(e.getLocationOnScreen().x,e.getLocationOnScreen().y);
+            selectNum.setCell((SudokuCell) e.getSource());
+            selectNum.setVisible(true);
+        }else{
+            selectNum.dispose();
+        }
+        
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public void mouseEntered(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

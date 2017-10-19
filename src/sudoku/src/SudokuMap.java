@@ -24,7 +24,7 @@ public class SudokuMap {
         {{9, 6, 3}, {4, 8, 1}, {7, 5, 2}},
         {{8, 1, 4}, {5, 2, 7}, {3, 6, 9}},};
     private int[] shuffle={1,2,3,4,5,6,7,8,9,1};//用于替换数字的数组，如在小九宫格数组内找到shuffle[0]的值时,将其替换成shuffle[1]的值，shuffle[0]和shuffle[9]的值必须相同
-    private int difficulty;
+    public int difficulty=1;
 
   
     public int[][][] getMap() {
