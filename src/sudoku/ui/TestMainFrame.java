@@ -24,6 +24,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.Timer;
@@ -37,7 +38,10 @@ public class TestMainFrame extends JFrame implements MouseListener{
     SudokuCell[][][] cells;
 //    int[][][] map=new int[9][3][3];
     private SelectNumFrame selectNum;
-    private LinkedList<SudokuCell> blankCellList=new LinkedList<SudokuCell>();
+    private LinkedList<SudokuCell> blankCellList;
+    private JPanel grid;
+    private boolean again=false;
+    private Stack<JPanel> gridStack;
     
     public TestMainFrame(){
         init();
@@ -46,16 +50,18 @@ public class TestMainFrame extends JFrame implements MouseListener{
     private void addCanvers(){
         SudokuMap m=new SudokuMap();
         m.shuffleMap();
-        cells=new SudokuCell[9][3][3];
         
-            this.setLayout(new GridLayout(3,3));
+        cells=new SudokuCell[9][3][3];
+        blankCellList=new LinkedList<SudokuCell>();
+        gridStack=new Stack<JPanel>();
         for (int i = 0; i < cells.length; i++) {
-            JPanel grid=new JPanel();
+            grid=new JPanel();
             grid.setLayout(new GridLayout(3,3));
             for (int j = 0; j < cells[i].length; j++) {
                 for (int k = 0; k < cells[i].length; k++) {
+                    
+                    
                     cells[i][j][k]=new SudokuCell();
-                    grid.add(cells[i][j][k]);
                     
                     if(Math.random()*10>m.difficulty){
                         cells[i][j][k].setText(""+m.getMap()[i][j][k]);
@@ -65,16 +71,18 @@ public class TestMainFrame extends JFrame implements MouseListener{
                         cells[i][j][k].addMouseListener(this);
                         cells[i][j][k].setBackground(Color.orange);
                         cells[i][j][k].recordLocation(i, j, k);
+                        cells[i][j][k].recordAnswer(m.getMap()[i][j][k]);
                         blankCellList.add(cells[i][j][k]);
                     }
                     grid.add(cells[i][j][k]);
                 }
             }
+            gridStack.push(grid);
             this.add(grid);
             grid.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createRaisedBevelBorder(), BorderFactory.createLoweredBevelBorder()));
             
         }
-        System.out.println(checkClear());
+        
     }
     
     
@@ -149,9 +157,10 @@ public class TestMainFrame extends JFrame implements MouseListener{
         this.setSize(600,600);
         this.setLocation(500,50);
         this.setTitle("Sudoku");
-        this.setResizable(false);
+        this.setResizable(true);
         this.setLayout(new GridLayout(3,3));
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setVisible(true);
     }
 
     
@@ -171,16 +180,30 @@ public class TestMainFrame extends JFrame implements MouseListener{
         if(e.getButton()==MouseEvent.BUTTON1){
             if(selectNum!=null){
             selectNum.dispose();
-        }
+            }
             selectNum=new SelectNumFrame();
             selectNum.setModal(true);
             selectNum.setLocation(e.getLocationOnScreen().x,e.getLocationOnScreen().y);
             selectNum.setCell((SudokuCell) e.getSource());
             selectNum.setVisible(true);
         }else{
-            selectNum.dispose();
+//            if(selectNum!=null){
+//            selectNum.dispose();
+//            }else{
+                ((SudokuCell)e.getSource()).setText(""+((SudokuCell) e.getSource()).answer);
+//            }
         }
-        System.out.println(checkClear());
+        if(checkClear()){
+            JOptionPane.showMessageDialog(this,"Congratulation!");
+            //因为所有的数字按钮全在grid里必须有grid的reference才能移除数字按钮，然后grid又在这个frame上所以先从grid把数字按钮全移除然后再挨个移除grid
+            while(!gridStack.isEmpty()){
+                JPanel t=(JPanel)gridStack.pop();
+                t.removeAll();
+                this.remove(t);
+            }
+            addCanvers();
+            
+        }
     }
 
     @Override

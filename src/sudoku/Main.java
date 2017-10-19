@@ -5,6 +5,7 @@
  */
 package sudoku;
 
+import sudoku.src.SudokuMap;
 import sudoku.ui.TestMainFrame;
 
 /**
@@ -17,8 +18,9 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        SudokuMap s=new SudokuMap();
+        s.getNewShuffleArray();
         TestMainFrame mainFrame=new TestMainFrame();
-        mainFrame.setVisible(true);
     }
     
 }

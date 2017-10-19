@@ -17,6 +17,7 @@ public class SudokuCell extends JButton {
     public int i;
     public int j;
     public int k;
+    public int answer;
     	public SudokuCell(){
 		this.setSize(60,60);
 		Font font = new Font("",2,24);
@@ -28,5 +29,9 @@ public class SudokuCell extends JButton {
         this.i=i;
         this.j=j;
         this.k=k;
+    }
+
+    void recordAnswer(int answer) {
+        this.answer=answer;
     }
 }
