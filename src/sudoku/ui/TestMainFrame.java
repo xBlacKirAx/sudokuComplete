@@ -15,6 +15,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
+import java.util.LinkedList;
+import java.util.Stack;
 import javax.swing.BorderFactory;
 
 import javax.swing.Icon;
@@ -35,6 +37,7 @@ public class TestMainFrame extends JFrame implements MouseListener{
     SudokuCell[][][] cells;
 //    int[][][] map=new int[9][3][3];
     private SelectNumFrame selectNum;
+    private LinkedList<SudokuCell> blankCellList=new LinkedList<SudokuCell>();
     
     public TestMainFrame(){
         init();
@@ -61,14 +64,85 @@ public class TestMainFrame extends JFrame implements MouseListener{
                     }else{
                         cells[i][j][k].addMouseListener(this);
                         cells[i][j][k].setBackground(Color.orange);
+                        cells[i][j][k].recordLocation(i, j, k);
+                        blankCellList.add(cells[i][j][k]);
                     }
                     grid.add(cells[i][j][k]);
                 }
             }
             this.add(grid);
             grid.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createRaisedBevelBorder(), BorderFactory.createLoweredBevelBorder()));
+            
         }
+        System.out.println(checkClear());
     }
+    
+    
+    
+    
+    
+    //检查是否通关
+    private boolean checkClear(){
+        boolean clear=true;
+        for (int index = 0; index < blankCellList.size(); index++) {
+            SudokuCell current=blankCellList.get(index);//用current来表示当前正在检查的node
+            
+            //第一部分先检查原先的空格是否全填满了。没填满回FALSE
+            if(current.getText().isEmpty()){
+                clear=false;
+            }
+            
+            //第二部分检查current所在的小九宫格是否有重复，有重复回FALSE
+            for (int row = 0; row < 3; row++) {
+                for (int col = 0; col < 3; col++) {
+                    if(current.getText().trim().equals(cells[current.i][row][col].getText().trim()) && !(current.j==row&&current.k==col)){
+                    clear= false;
+                    }
+                }
+            }
+            
+            
+            //第三部分检查current所在的行是否有重复，有重复回FALSE
+            int start;
+            if(current.i<3){
+                start=0;
+            }else if(current.i>=3 && current.i<6){
+                start=3;
+            }else{
+                start=6;
+            }
+            for (int grid = start; grid < start+3; grid++) {
+                for (int col = 0; col < 3; col++) {
+                    if(current.getText().trim().equals(cells[grid][current.j][col].getText().trim()) && !(current.i==grid&&current.k==col)){
+                            clear= false;
+                    }
+                }
+            }
+            
+            
+            //第四部分检查current所在的列是否有重复，有重复回FALSE
+            if(current.i%3==0){
+                start=0;
+            }else if(current.i%3==1){
+                start=1;
+            }else if(current.i%3==2){
+                start=2;
+            }
+            for (int grid = start; grid < 9; grid+=3) {
+                for (int row = 0; row < 3; row++) {
+                    if(current.getText().trim().equals(cells[grid][row][current.k].getText().trim()) && !(current.i==grid&&current.j==row)){
+                        System.out.println(cells[grid][row][current.k].getText().trim());
+                            clear= false;
+                    }
+                }
+            }
+            
+        }
+        return clear;
+    }
+    
+    
+    
     
     //界面基础设定
     private void init(){
@@ -99,13 +173,14 @@ public class TestMainFrame extends JFrame implements MouseListener{
             selectNum.dispose();
         }
             selectNum=new SelectNumFrame();
+            selectNum.setModal(true);
             selectNum.setLocation(e.getLocationOnScreen().x,e.getLocationOnScreen().y);
             selectNum.setCell((SudokuCell) e.getSource());
             selectNum.setVisible(true);
         }else{
             selectNum.dispose();
         }
-        
+        System.out.println(checkClear());
     }
 
     @Override
